@@ -2,6 +2,7 @@ import properties
 import urllib
 import json
 import time
+from instapush import App
 
 
 class Product:
@@ -12,12 +13,6 @@ class Product:
         self.online_details = ''
         self.available_in_store = False
         self.stores_available = []
-
-    def __str__(self):
-        return str(json.dumps(self.__dict__))
-
-    def __repr__(self):
-        return str(json.dumps(self.__dict__))
 
 
 def check_online_status():
@@ -35,9 +30,10 @@ def check_online_status():
             products[sku].valid_sku = True
             products[sku].name = found_product['name']
             products[sku].available_online = (found_product['onlineAvailability'] and
-                                              'Shipping' in found_product['onlineAvailabilityText'])
+                                              (not 'Backordered' in found_product['onlineAvailabilityText']
+                                                and not 'Pre-order' in found_product['onlineAvailabilityText']))
             products[sku].online_details = found_product['onlineAvailabilityText']
-        if page == data['totalPages']:
+        if page >= data['totalPages']:
             break
         else:
             page += 1
@@ -53,13 +49,12 @@ def check_store_status():
                     '&show=products.sku,name&page=' + str(page) + '&format=json'
         response = urllib.urlopen(store_url)
         data = json.load(response)
-        print data
         stores = data['stores']
         for store in stores:
             for sku in [product['sku'] for product in store['products']]:
                 products[sku].available_in_store = True
                 products[sku].stores_available.append(store['name'])
-        if page == data['totalPages']:
+        if page >= data['totalPages']:
             break
         else:
             page += 1
@@ -71,13 +66,12 @@ products = {sku: Product() for sku in skus}
 check_online_status()
 check_store_status()
 
-message = []
+app = App(appid=properties.insta_app_id, secret=properties.insta_app_secret)
 for sku, product in products.iteritems():
     if not product.valid_sku:
-        message.append('Invalid sku: ' + str(sku))
+        app.notify(event_name='sku_error', trackers={'sku': str(sku)})
     if product.available_online:
-        message.append(product.name + ' available online: ' + product.online_details + '!')
+        app.notify(event_name='online_product_update', trackers={'name': product.name, 'text': product.online_details})
     if product.available_in_store:
-        message.append(product.name + ' available in store: ' + ', '.join(product.stores_available) + '!')
-
-print message
+        app.notify(event_name='in-store_product_update', trackers={
+            'name': product.name, 'stores': ', '.join(product.stores_available)})

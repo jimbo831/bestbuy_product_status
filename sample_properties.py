@@ -6,3 +6,7 @@ skus = '5577872,5621843,5578849'
 zip_code = 00000
 # Radius to search for in-store stock from your zip code in miles
 store_range = 10
+# Application ID for Instapush
+insta_app_id = 'your_insta_app_id'
+# Application Secret for Instapush
+insta_app_secret = 'your_insta_app_secret'

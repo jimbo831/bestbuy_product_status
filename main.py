@@ -37,8 +37,8 @@ def check_online_status():
 
 
 def check_store_status():
-    store_url = 'https://api.bestbuy.com/v1/stores((area(' + str(properties.zip) + ',' + \
-                str(properties.range) + '))&((storeType=bigbox)))+products(sku%20in%20(' + \
+    store_url = 'https://api.bestbuy.com/v1/stores((area(' + str(properties.zip_code) + ',' + \
+                str(properties.store_range) + '))&((storeType=bigbox)))+products(sku%20in%20(' + \
                 properties.skus + '))?apiKey=' + str(properties.api_key) + \
                 '&show=products.sku,name&format=json'
     response = urllib.urlopen(store_url)

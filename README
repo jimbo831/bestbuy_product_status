@@ -1,0 +1,16 @@
+This is a simple Python script that uses the Best Buy developer APIs to see if a product is available to order online or pickup in a nearby store.
+
+It uses Instapush to provide push notifications via iOS or Android and requires the InstapushPython wrapper module:
+
+https://github.com/adamwen829/instapush-py
+
+Instructions
+
+Get a Best Buy API key at https://developer.bestbuy.com
+Sign up with an Instapush account (or modify the code to alert you some other way if you prefer)
+Copy the bestbuy_product_status.py file and sample_properties.py file to a computer with Python installed.
+Fill out the information on the properties file and rename it properties.py.
+Use your OS to schedule bestbuy_product_status.py to run as often as you like.  I set mine to run every 15 minutes.
+
+The application will notify you anytime a sku on your list is available to purchase online or in a store.
+It is configured to ignore items that are on backorder or pre-order.

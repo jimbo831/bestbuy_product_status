@@ -43,7 +43,6 @@ def check_store_status():
                 '&show=products.sku,name&format=json'
     response = urllib.urlopen(store_url)
     data = json.load(response)
-    print data
     stores = data['stores']
     for store in stores:
         for sku in [product['sku'] for product in store['products']]:
@@ -55,20 +54,14 @@ skus = [int(x) for x in properties.skus.split(',')]
 products = {sku: Product() for sku in skus}
 check_online_status()
 check_store_status()
-print products
 
+message = []
+for sku, product in products.iteritems():
+    if not product.valid_sku:
+        message.append('Invalid sku: ' + str(sku))
+    if product.available_online:
+        message.append(product.name + ' available online: ' + product.online_details + '!')
+    if product.available_in_store:
+        message.append(product.name + ' available in store: ' + ', '.join(product.stores_available) + '!')
 
-# message = []
-# try:
-#     online_status = check_online_status(properties.skus)
-#     if online_status:
-#         message.append(psc.get_product_name(sku) +
-#                        ' is in stock online!')
-# except SkuError, arg:
-#     message.append('SKU problem with ' + str(arg))
-# store_status = check_store_status(properties.skus)
-# if len(store_status) > 0:
-#     message.append(psc.get_product_name(sku) +
-#                    ' is in stock at ' + ', '.join(store_status) + '!')
-# print message
-
+print message
